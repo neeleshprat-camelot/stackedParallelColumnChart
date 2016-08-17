@@ -277,20 +277,10 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 				.data(csvData)
 				.enter().append("line")
 				.attr("x1", function(d, i) {
-					// var cd = '';
-					// for (var j = 0; j < dset.length; j++) {
-					// 	cd = cd + d[dset[j]];
-					// }
-					// return xAxisScaleLowestDim(cd) + xAxisScaleLowestDim.rangeBand();
 					return i * xAxisScaleLowestDim.rangeBand();
 				})
 				.attr("y1", 0)
 				.attr("x2", function(d, i) {
-					// var cd = '';
-					// for (var j = 0; j < dset.length; j++) {
-					// 	cd = cd + d[dset[j]];
-					// }
-					// return xAxisScaleLowestDim(cd) + xAxisScaleLowestDim.rangeBand();
 					return i * xAxisScaleLowestDim.rangeBand();
 				})
 				.attr("y2", 5);
@@ -406,6 +396,35 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 
 			/*------------------------------------------------------------Bars-------------------------------------------------------------------------- */
 
+			var mouseOver = function(label, value, object) {
+				var position = d3.mouse(object);
+
+				//append tooltip element
+				var tooltip = vis.append("g")
+					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_tooltip_container");
+
+				tooltip.append("rect")
+					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_tooltip_container-rect")
+					.attr("x", position[0] - 5)
+					.attr("y", position[1] - 10)
+					.attr("height", 30)
+					.attr("fill", "#F9FBF7")
+					.attr("stroke", "#000")
+					.attr("stroke-width", 0.1)
+					.style("opacity", 1);
+
+				var tooltip_text = tooltip.append("text")
+					.attr("x", position[0])
+					.attr("y", position[1] - 10)
+					.html("<tspan dy=\"1.2em\">" + label + "</tspan>: <tspan > " + value + " </tspan>");
+
+				var bbox = tooltip_text.node().getBBox();
+				var bboxw = bbox.width * 1.1;
+				tooltip.select(".camelot_viz_ext_stackedparallelcolumnchart_tooltip_container-rect")
+					.attr("width", bboxw);
+
+			};
+
 			//for measure set 1
 			mset1.forEach(function(d, index) {
 				var measName = mset1[index];
@@ -442,9 +461,11 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 							return "#005284";
 						}
 					})
-					.append("title")
-					.text(function(d) {
-						return measName + ": " + parseFloat(d[measName]).toFixed(2);
+					.on("mouseover", function(d) {
+						mouseOver(measName, d[measName], this);
+					})
+					.on("mouseout", function() {
+						d3.select(".camelot_viz_ext_stackedparallelcolumnchart_tooltip_container").remove();
 					});
 			});
 
@@ -492,15 +513,17 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 							}
 						}
 					})
-					.append("title")
-					.text(function(d) {
-						return measName + ": " + parseFloat(d[measName]).toFixed(2);
+					.on("mouseover", function(d) {
+						mouseOver(measName, d[measName], this);
+					})
+					.on("mouseout", function() {
+						d3.select(".camelot_viz_ext_stackedparallelcolumnchart_tooltip_container").remove();
 					});
 			});
 
 			if (capaKPIVisible) {
 				//75% utilization line
-				var kpiLabel = "75% of avg. yearly Capacity: ";
+				var kpiLabel = "75% of avg. yearly Capacity";
 				visPlotArea.append("g")
 					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Utilization_RefLine")
 					.attr("transform", "translate(" + 0 + "," + 0 + ")")
@@ -509,8 +532,12 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					.attr("y1", yAxisScale(capacityKpi))
 					.attr("x2", plotAreaWidth)
 					.attr("y2", yAxisScale(capacityKpi))
-					.append("title")
-					.text(kpiLabel + parseFloat(capacityKpi).toFixed(2));
+					.on("mouseover", function(d) {
+						mouseOver(kpiLabel, parseFloat(capacityKpi).toFixed(2), this);
+					})
+					.on("mouseout", function() {
+						d3.select(".camelot_viz_ext_stackedparallelcolumnchart_tooltip_container").remove();
+					});
 			}
 
 			/*-------------------------------------------------------------End of Bars-------------------------------------------------------------------------- */

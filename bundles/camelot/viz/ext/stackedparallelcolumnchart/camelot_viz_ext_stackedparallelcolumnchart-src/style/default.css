@@ -76,4 +76,16 @@
     font-style: normal;
     font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 }
+
+.camelot_viz_ext_stackedparallelcolumnchart_tooltip_container rect {
+	
+}
+
+.camelot_viz_ext_stackedparallelcolumnchart_tooltip_container text {
+	fill: #000000;
+	font-size: 15px;
+    font-weight: bold;
+    font-style: normal;
+    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+}
 /* For example, adding the extension id as prefix of CSS class name. */
