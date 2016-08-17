@@ -65,6 +65,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 			var legendVisibility = properties.legend && (properties.legend.visible != null) ? properties.legend.visible : true;
 			var yAxisLineVisibility = properties.yAxisLine && (properties.yAxisLine.visible != null) ? properties.yAxisLine.visible : true;
 			var yAxisLabelVisible = properties.yAxisLabel && (properties.yAxisLabel.visible != null) ? properties.yAxisLabel.visible : true;
+			var capaKPIVisible = properties.capacitykpi && (properties.capacitykpi.visible != null) ? properties.capacitykpi.visible : true;
 
 			//define default margin with some standard top, bottom, right, left values
 			var defaultMargin = {
@@ -130,15 +131,15 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 			}
 
 			var asRatio = 1000;
-			if(maxMsetSum < 2500 && maxMsetSum >= 1000) {
+			if (maxMsetSum < 2500 && maxMsetSum >= 1000) {
 				asRatio = 500;
-			} else if(maxMsetSum < 1000 && maxMsetSum >= 500) {
+			} else if (maxMsetSum < 1000 && maxMsetSum >= 500) {
 				asRatio = 200;
-			} else if(maxMsetSum < 500 && maxMsetSum >= 100) {
+			} else if (maxMsetSum < 500 && maxMsetSum >= 100) {
 				asRatio = 100;
-			} else if(maxMsetSum < 100 && maxMsetSum >= 50) {
+			} else if (maxMsetSum < 100 && maxMsetSum >= 50) {
 				asRatio = 20;
-			} else if(maxMsetSum < 50 && maxMsetSum >= 10) {
+			} else if (maxMsetSum < 50 && maxMsetSum >= 10) {
 				asRatio = 10;
 			}
 			var numberOfTicks = 5;
@@ -497,18 +498,20 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					});
 			});
 
-			//75% utilization line
-			var kpiLabel = "75% of avg. yearly Capacity: ";
-			visPlotArea.append("g")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Utilization_RefLine")
-				.attr("transform", "translate(" + 0 + "," + 0 + ")")
-				.append("line")
-				.attr("x1", 0)
-				.attr("y1", yAxisScale(capacityKpi))
-				.attr("x2", plotAreaWidth)
-				.attr("y2", yAxisScale(capacityKpi))
-				.append("title")
-				.text(kpiLabel + parseFloat(capacityKpi).toFixed(2));
+			if (capaKPIVisible) {
+				//75% utilization line
+				var kpiLabel = "75% of avg. yearly Capacity: ";
+				visPlotArea.append("g")
+					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Utilization_RefLine")
+					.attr("transform", "translate(" + 0 + "," + 0 + ")")
+					.append("line")
+					.attr("x1", 0)
+					.attr("y1", yAxisScale(capacityKpi))
+					.attr("x2", plotAreaWidth)
+					.attr("y2", yAxisScale(capacityKpi))
+					.append("title")
+					.text(kpiLabel + parseFloat(capacityKpi).toFixed(2));
+			}
 
 			/*-------------------------------------------------------------End of Bars-------------------------------------------------------------------------- */
 
