@@ -3,7 +3,11 @@ var sampleTemplate = {
 	"name": "Standard",
 	"properties": {
 		"camelot.viz.ext.stackedparallelcolumnchart": {
-
+			"legend": {
+				"title": {
+					"visible": true
+				}
+			}
 		}
 	}
 };

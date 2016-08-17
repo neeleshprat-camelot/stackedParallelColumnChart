@@ -1,7 +1,6 @@
 define("stackedparallelcolumnchart-bundle", ["camelot_viz_ext_stackedparallelcolumnchart-src/js/flow",
-	"camelot_viz_ext_stackedparallelcolumnchart-src/js/propertyeditor/spec",
 	"css!camelot_viz_ext_stackedparallelcolumnchart-src/style/default.css"
-], function(flowDefinition, propertyEditorSpec, cssStyleDeclaration) {
+], function(flowDefinition, cssStyleDeclaration) {
 	var cssString = "",
 		rules, i;
 	if (cssStyleDeclaration && cssStyleDeclaration.cssRules) {
@@ -37,14 +36,10 @@ define("stackedparallelcolumnchart-bundle", ["camelot_viz_ext_stackedparallelcol
 				"resources": [{
 					"key": "sap.viz.api.env.Template.loadPaths",
 					"path": "./camelot_viz_ext_stackedparallelcolumnchart-src/resources/templates"
-				}, {
-					"key": "sap.viz.controls.openpe.Language.loadPaths",
-					"path": "./camelot_viz_ext_stackedparallelcolumnchart-src/resources/languages/propertyeditor"
 				}]
 			}
 		}]
 	});
-	vizExtBundle.components = vizExtBundle.components.concat(propertyEditorSpec.components);
 	// sap.bi.framework.getService is defined in BundleLoader, which is
 	// always available at this timeframe
 	// in standalone mode sap.viz.js will force load and active the

@@ -3,12 +3,6 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/utils/util", [], funct
 	/*
 	 * In most cases, you don't need to modify the following code.
 	 */
-
-	var monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni",
-		"Juli", "August", "September", "Oktober", "November", "Dezember"
-	];
-	var timeDivision = [".YTD", "FC+3", "FC+6"];
-
 	var _util = { /*__FOLD__*/
 		/*
 		 * Converts data to flatten table format. Accepts MultiAxisDataAdapter, CrosstableDataset and FlattableDataset as data input.
@@ -479,53 +473,6 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/utils/util", [], funct
 				data: selectionData
 			});
 			return selectElements;
-		},
-
-		//define sorting functions
-		yearComparator: function(propYear) {
-			return function(a, b) {
-				return a[propYear] - b[propYear];
-			};
-		},
-
-		monthComparator: function(propYear, propTD, propMonth) {
-			return function(a, b) {
-				if (timeDivision.indexOf(a[propTD]) < timeDivision.indexOf(b[propTD])) {
-					return -1;
-				} else if (timeDivision.indexOf(a[propTD]) > timeDivision.indexOf(b[propTD])) {
-					return 1;
-				} else {
-					var monthA = monthNames.indexOf(a[propMonth]);
-					var dateA = new Date(a[propYear], monthA, 1);
-					var monthB = monthNames.indexOf(b[propMonth]);
-					var dateB = new Date(b[propYear], monthB, 1);
-					return dateA - dateB; //sort by date ascending
-				}
-			};
-		},
-
-		tdComparator: function(propYear, propTD) {
-			return function(a, b) {
-				if (a[propYear] <= b[propYear]) {
-					if (timeDivision.indexOf(a[propTD]) < timeDivision.indexOf(b[propTD])) {
-						return -1;
-					} else if (timeDivision.indexOf(a[propTD]) === timeDivision.indexOf(b[propTD])) {
-						return 0;
-					} else {
-						return 1;
-					}
-				} else {
-					return 1;
-				}
-			};
-		},
-
-		//find the string pixel length
-		pixelLength: function(str) {
-			var canvas = document.createElement('canvas');
-			var ctx = canvas.getContext("2d");
-			ctx.font = "10px 'Open Sans', Arial, Helvetica, sans-serif";
-			return ctx.measureText(str).width;
 		}
 	};
 	return _util;

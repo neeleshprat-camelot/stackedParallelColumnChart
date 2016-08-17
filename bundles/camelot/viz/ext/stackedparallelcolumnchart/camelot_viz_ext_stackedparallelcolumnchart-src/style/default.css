@@ -6,74 +6,56 @@
     shape-rendering: crispEdges;
     stroke-width: 1;
 }
+
 .camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_GridLines line {
     fill: none;
     stroke: #ececec;
     shape-rendering: crispEdges;
     stroke-width: 1;
 }
+
 .camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Ticks line {
     fill: none;
     stroke: #878786;
     shape-rendering: crispEdges;
     stroke-width: 1;
 }
+
 .camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Labels text {
-    fill: #737373;
-    font-size: 10px;
-    font-weight: normal;
-    font-style: normal;
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	fill: #737373;
+	font-size: 10px;
+	font-weight: normal;
+	font-style: normal;
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 }
-.camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_MainLabel text {
-    fill: #737373;
-    font-size: 10px;
-    font-weight: normal;
-    font-style: normal;
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-}
+
 .camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Line line {
     fill: none;
     stroke: #878786;
     shape-rendering: crispEdges;
     stroke-width: 1;
 }
+
 .camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks line {
-    fill: none;
+	fill: none;
     stroke: #878786;
     shape-rendering: crispEdges;
     stroke-width: 1;
-}
-.camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_LowestDim line {
-    fill: none;
-    stroke: #878786;
-    shape-rendering: crispEdges;
-    stroke-width: 1;
-}
-.camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels text {
-    fill: #737373;
-    font-size: 10px;
-    font-weight: normal;
-    font-style: normal;
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-}
-.camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Utilization_RefLine line {
-    fill: none;
-    stroke: #96BC33;
-    shape-rendering: crispEdges;
-    stroke-width: 3;
-}
-.camelot_viz_ext_stackedparallelcolumnchart_visLegend line {
-    fill: none;
-    stroke: #96BC33;
-    shape-rendering: crispEdges;
-    stroke-width: 3;
 }
 
-.camelot_viz_ext_stackedparallelcolumnchart_visLegend text {
+.camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_LowestDim line {
+	fill: none;
+    stroke: #878786;
+    shape-rendering: crispEdges;
+    stroke-width: 1;
+}
+
+
+.camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels text {
 	fill: #737373;
-    font-weight: normal;
-    font-style: normal;
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+	font-style: normal;
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 }
 /* For example, adding the extension id as prefix of CSS class name. */

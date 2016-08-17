@@ -2,7 +2,7 @@
 	"metadataVersion": "1.0",
 	"id": "camelot.viz.ext.stackedparallelcolumnchart",
 	"name": "Stacked Parallel Column Chart",
-	"description": "Chart for several measures to be displayed in parallel bars or stacked bars",
+	"description": "Combination of stacked and parallel column chart with a reference line based on one of the measures.",
 	"version": "1.0.0",
 	"vendor": {
 		"name": "Camelot ITLab",

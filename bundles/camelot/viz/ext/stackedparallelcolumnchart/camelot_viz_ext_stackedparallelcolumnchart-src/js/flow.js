@@ -17,7 +17,18 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/flow", ["camelot_viz_e
 			"propertyCategory": "title",
 			"place": "top"
 		});
-		
+
+		var legendElement = sap.viz.extapi.Flow.createElement({
+			id: "sap.viz.chart.elements.ColorLegend",
+			name: "Legend",
+			dimensionIndex: [1]
+		});
+		flow.addElement({
+			"element": legendElement,
+			"propertyCategory": "legend",
+			"place": "right"
+		});
+
 		var element = sap.viz.extapi.Flow.createElement({
 			id: "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
 			name: "Stacked Parallel Column Chart Module"
@@ -67,56 +78,6 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/flow", ["camelot_viz_e
 			"propertyCategory": "plotArea"
 		});
 		sap.viz.extapi.Flow.registerFlow(flow);
-
-			
-		element.addProperty({
-			name: "gridline",
-			type: "Object",
-			supportedValues: {
-				visible: {
-					name: "visible",
-					type: "Boolean",
-					supportedValues: [true, false]
-				}
-			}
-		});
-
-		element.addProperty({
-			name: "yAxisLine",
-			type: "Object",
-			supportedValues: {
-				visible: {
-					name: "visible",
-					type: "Boolean",
-					supportedValues: [true, false]
-				}
-			}
-		});
-
-		element.addProperty({
-			name: "legend",
-			type: "Object",
-			supportedValues: {
-				visible: {
-					name: "visible",
-					type: "Boolean",
-					supportedValues: [true, false]
-				}
-			}
-		});
-		
-		element.addProperty({
-			name: "yAxisLabel",
-			type: "Object",
-			supportedValues: {
-				visible: {
-					name: "visible",
-					type: "Boolean",
-					supportedValues: [true, false]
-				}
-			}
-		});
-
 	};
 	flowRegisterFunc.id = "camelot.viz.ext.stackedparallelcolumnchart";
 	return {

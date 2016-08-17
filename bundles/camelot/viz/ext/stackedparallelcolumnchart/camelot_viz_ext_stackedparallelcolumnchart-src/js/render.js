@@ -1,619 +1,593 @@
-define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz_ext_stackedparallelcolumnchart-src/js/utils/util"],
-	function(util) {
-		/*
-		 * This function is a drawing function; you should put all your drawing logic in it.
-		 * it's called in moduleFunc.prototype.render
-		 * @param {Object} data - proceessed dataset, check dataMapping.js
-		 * @param {Object} container - the target d3.selection element of plot area
-		 * @example
-		 *   container size:     this.width() or this.height()
-		 *   chart properties:   this.properties()
-		 *   dimensions info:    data.meta.dimensions()
-		 *   measures info:      data.meta.measures()
-		 */
-		var render = function(data, container) {
+define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", [], function() {
+	/*
+	 * This function is a drawing function; you should put all your drawing logic in it.
+	 * it's called in moduleFunc.prototype.render
+	 * @param {Object} data - proceessed dataset, check dataMapping.js
+	 * @param {Object} container - the target d3.selection element of plot area
+	 * @example
+	 *   container size:     this.width() or this.height()
+	 *   chart properties:   this.properties()
+	 *   dimensions info:    data.meta.dimensions()
+	 *   measures info:      data.meta.measures()
+	 */
+	var render = function(data, container) {
 
-			/* -----------------------------------------------------------------Data Preparation-------------------------------------------------------------------------- */
+		/* -----------------------------------------------------------------Data Preparation-------------------------------------------------------------------------- */
 
-			//get dimensions and measures from the metadata
-			var dset = data.meta.dimensions('X Axis');
-			var mset1 = data.meta.measures('Y Axis 1');
-			var mset2 = data.meta.measures('Y Axis 2');
+		//get dimensions and measures from the metadata
+		var dset = data.meta.dimensions('X Axis');
+		var mset1 = data.meta.measures('Y Axis 1');
+		var mset2 = data.meta.measures('Y Axis 2');
 
-			var csvData = data;
+		var csvData = data;
 
-			var dimName1 = dset[0];
-			var dimName2 = dset[1];
-			var dimName3 = dset[2];
+		var dimName1 = dset[0];
+		var dimName2 = dset[1];
+		var dimName3 = dset[2];
 
-			//get the max of sum of the measure sets value from the entire dataset
-			var maxMsetSum = d3.max(csvData, function(d) {
-				return d3.max([d3.sum(mset1, function(m) {
-					return d[m];
-				}), d3.sum(mset2, function(m) {
-					return d[m];
-				})]);
-			});
+		var monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni",
+			"Juli", "August", "Septeber", "Oktober", "November", "Dezember"
+		];
+		var timeDivision = [".YTD", "FC+3", "FC+6"];
 
-			//get the 75% of average of the first measure set across the first dimension
-			var sum = d3.sum(csvData, function(d) {
-				return d3.sum(mset1, function(m) {
-					return d[m];
-				});
-			});
-			var capacityKpi = sum / csvData.length * 0.75;
-
-			var sortFunction;
-			//sort data based on the available dimensions
-			if (dimName3) {
-				sortFunction = util.monthComparator(dimName1, dimName2, dimName3);
-				csvData.sort(sortFunction);
-			} else if (dimName2) {
-				sortFunction = util.tdComparator(dimName1, dimName2);
-				csvData.sort(sortFunction);
-			} else {
-				sortFunction = util.yearComparator(dimName1);
-				csvData.sort(sortFunction);
-			}
-
-			/* --------------------------------------------------------------End of Data Preparation------------------------------------------------------------------- */
-
-			/* --------------------------------------------------------------------Plot Area-------------------------------------------------------------------------- */
-
-			var properties = this.properties();
-			var gridLinesVisibility = properties.gridline && (properties.gridline.visible != null) ? properties.gridline.visible : true;
-			var legendVisibility = properties.legend && (properties.legend.visible != null) ? properties.legend.visible : true;
-			var yAxisLineVisibility = properties.yAxisLine && (properties.yAxisLine.visible != null) ? properties.yAxisLine.visible : true;
-			var yAxisLabelVisible = properties.yAxisLabel && (properties.yAxisLabel.visible != null) ? properties.yAxisLabel.visible : true;
-
-			//define default margin with some standard top, bottom, right, left values
-			var defaultMargin = {
-				top: 20,
-				right: 20,
-				bottom: 20,
-				left: 20
+		function yearComparator(propYear) {
+			return function(a, b) {
+				return a[propYear] - b[propYear];
 			};
+		}
 
-			//derive width and height from the default margin values
-			var visWidth = this.width() - defaultMargin.left - defaultMargin.right;
-			var visHeight = this.height() - defaultMargin.top - defaultMargin.bottom;
-
-			//remove any older svg element from the selection
-			container.selectAll('svg').remove();
-
-			//create a new svg element and a canvas 'g' with its weight and height attributes
-			//this svg element contains plotArea + title + legend
-			var vis = container.append('svg').attr('width', visWidth).attr('height', visWidth)
-				.append('g').attr('class', 'camelot_viz_ext_stackedparallelcolumnchart_vis').attr('width', visWidth).attr('height', visWidth);
-
-			var visMargin = {
-				top: 20,
-				bottom: 20,
-				right: legendVisibility ? 200 : 20,
-				left: 50
-			};
-
-			//define the width and height of the vis elements plotArea + title + legend
-			var plotAreaWidth = visWidth - visMargin.right - visMargin.left;
-			var plotAreaHeight = visHeight - visMargin.top - visMargin.bottom;
-
-			//create respectice group elements for each vis element, assign them widht and height, and place them
-
-			var visPlotArea = vis.append("g")
-				.attr('class', 'camelot_viz_ext_stackedparallelcolumnchart_visPlotArea')
-				.attr("width", plotAreaWidth)
-				.attr("height", plotAreaHeight)
-				.attr("transform", "translate(" + (visMargin.left + defaultMargin.left) + "," + (visMargin.top + defaultMargin.top) + ")");
-
-			//Y Axis
-			//define a Y Axis scale
-			var xAxisLabelsHeight = 60;
-			var yAxisRange = plotAreaHeight - xAxisLabelsHeight;
-			var yAxisScale = d3.scale.linear().rangeRound([yAxisRange, 0]);
-
-			//assign domain with 20% for extra spacing
-			yAxisScale.domain([0, maxMsetSum * 1.20]);
-
-			//Y Axis Line
-			var visPlotArea_Yaxis = visPlotArea
-				.append("g")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis")
-				.attr("transform", "translate(" + 0 + "," + 0 + ")");
-			if (yAxisLineVisibility) {
-				visPlotArea_Yaxis.append("g")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Line")
-					.append("line")
-					.attr("x1", 0)
-					.attr("y1", 0)
-					.attr("x2", 0)
-					.attr("y2", yAxisRange);
-			}
-
-			var numberOfTicks = 5;
-			var tDist = ((maxMsetSum / numberOfTicks) / 1000).toFixed(0) * 1000;
-			var ticks = [];
-			for (var i = 0; i < numberOfTicks; i++) {
-				var tick = {
-					id: (i + 1) * tDist,
-					label: ((i + 1) * tDist / 1000).toString() + "k"
-				};
-				ticks.push(tick);
-			}
-
-			//Y Axis Grid Lines
-			if (gridLinesVisibility) {
-				var visYAxisGridLine = visPlotArea_Yaxis.append("g")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_GridLines");
-				visYAxisGridLine.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_GridLine_Line")
-					.data(ticks)
-					.enter().append("line")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_GridLine_Line")
-					.attr("x1", 0)
-					.attr("y1", function(d) {
-						return yAxisScale(d.id);
-					})
-					.attr("x2", plotAreaWidth)
-					.attr("y2", function(d) {
-						return yAxisScale(d.id);
-					});
-			}
-
-			//Y Axis Ticks
-			var visYAxisTicks = visPlotArea_Yaxis.append("g")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Ticks");
-			visYAxisTicks.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Ticks_Line")
-				.data(ticks)
-				.enter().append("line")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Ticks_Line")
-				.attr("x1", 0)
-				.attr("y1", function(d) {
-					return yAxisScale(d.id);
-				})
-				.attr("x2", -5)
-				.attr("y2", function(d) {
-					return yAxisScale(d.id);
-				});
-
-			//Y Axis Tick Labels
-			var visYAxisLabels = visPlotArea_Yaxis.append("g")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Labels");
-			visYAxisLabels.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Labels_Text")
-				.data(ticks)
-				.enter().append("text")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Labels_Text")
-				.attr("x", 0 - 30)
-				.attr("y", function(d) {
-					return yAxisScale(d.id);
-				})
-				.text(function(d) {
-					return d.label;
-				});
-
-			if (yAxisLabelVisible) {
-				//Y Axis Main Label
-				var mainLabelText = "";
-				for (var i = 0; i < d3.max([mset1.length, mset2.length]); i++) {
-					if (i < mset1.length) {
-						if (util.pixelLength(mainLabelText + mset1[i]) < (plotAreaHeight - xAxisLabelsHeight - 20)) {
-							mainLabelText = (mainLabelText.length === 0) ? mset1[i] : mainLabelText + " & " + mset1[i];
-						} else {
-							mainLabelText = mainLabelText + "...";
-							break;
-						}
-					}
-					if (i < mset2.length) {
-						if (util.pixelLength(mainLabelText + mset2[i]) < (plotAreaHeight - xAxisLabelsHeight - 20)) {
-							mainLabelText = (mainLabelText.length === 0) ? mset2[i] : mainLabelText + " & " + mset2[i];
-						} else {
-							mainLabelText = mainLabelText + "...";
-							break;
-						}
-					}
+		function monthComparator(propYear, propTD, propMonth) {
+			return function(a, b) {
+				if (timeDivision.indexOf(a[propTD]) < timeDivision.indexOf(b[propTD])) {
+					return -1;
+				} else if (timeDivision.indexOf(a[propTD]) > timeDivision.indexOf(b[propTD])) {
+					return 1;
+				} else {
+					var monthA = monthNames.indexOf(a[propMonth]);
+					var dateA = new Date(a[propYear], monthA, 1);
+					var monthB = monthNames.indexOf(b[propMonth]);
+					var dateB = new Date(b[propYear], monthB, 1);
+					return dateA - dateB; //sort by date ascending
 				}
+			};
+		}
 
-				var visYAxisMainLabel = visPlotArea_Yaxis.append("g")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_MainLabel");
-				visYAxisMainLabel.append("text")
-					.attr("x", -(plotAreaHeight / 1.60))
-					.attr("y", -50)
-					.text(mainLabelText)
-					.attr("transform", "rotate(-90)");
+		function tdComparator(propYear, propTD) {
+			return function(a, b) {
+				if (a[propYear] < b[propYear] && timeDivision.indexOf(a[propTD]) < timeDivision.indexOf(b[propTD])) {
+					return -1;
+				} else {
+					return 1;
+				}
+			};
+		}
+
+		var sortFunction;
+		//sort data based on the available dimensions
+		if (dimName3) {
+			sortFunction = monthComparator(dimName1, dimName2, dimName3);
+			csvData.sort(sortFunction);
+		} else if (dimName2) {
+			sortFunction = tdComparator(dimName1, dimName2);
+			csvData.sort(sortFunction);
+		} else {
+			sortFunction = yearComparator(dimName1);
+			csvData.sort(sortFunction);
+		}
+
+		/* --------------------------------------------------------------End of Data Preparation------------------------------------------------------------------- */
+
+		/* --------------------------------------------------------------------Plot Area-------------------------------------------------------------------------- */
+
+		//define default margin with some standard top, bottom, right, left values
+		var defaultMargin = {
+			top: 20,
+			right: 20,
+			bottom: 20,
+			left: 20
+		};
+
+		//derive width and height from the default margin values
+		var visWidth = this.width() - defaultMargin.left - defaultMargin.right;
+		var visHeight = this.height() - defaultMargin.top - defaultMargin.bottom;
+		var colorPalette = this.colorPalette();
+
+		//remove any older svg element from the selection
+		container.selectAll('svg').remove();
+
+		//create a new svg element and a canvas 'g' with its weight and height attributes
+		//this svg element contains plotArea + title + legend
+		var vis = container.append('svg').attr('width', visWidth).attr('height', visWidth)
+			.append('g').attr('class', 'camelot_viz_ext_stackedparallelcolumnchart_vis').attr('width', visWidth).attr('height', visWidth);
+
+		var visMargin = {
+			top: 20,
+			bottom: 20,
+			right: 100,
+			left: 20
+		};
+
+		//define the width and height of the vis elements plotArea + title + legend
+		var plotAreaWidth = visWidth - visMargin.right - visMargin.left;
+		var plotAreaHeight = visHeight - visMargin.top - visMargin.bottom;
+
+		var legendWidth = visWidth - plotAreaWidth;
+		var legendHeight = visHeight - visMargin.top;
+
+		var titleWidth = visWidth;
+		var titleHeight = visMargin.top;
+
+		//create respectice group elements for each vis element, assign them widht and height, and place them
+		var visLegend = vis.append("g")
+			.attr('class', 'camelot_viz_ext_stackedparallelcolumnchart_visLegend')
+			.attr("width", legendWidth)
+			.attr("height", legendHeight)
+			.attr("transform", "translate(" + visWidth - visMargin.right + "," + visMargin.top + ")");
+
+		var visTitle = vis.append("g")
+			.attr('class', 'camelot_viz_ext_stackedparallelcolumnchart_visTitle')
+			.attr("width", titleWidth)
+			.attr("height", titleHeight)
+			.attr("transform", "translate(" + 0 + "," + 0 + ")");
+
+		var visPlotArea = vis.append("g")
+			.attr('class', 'camelot_viz_ext_stackedparallelcolumnchart_visPlotArea')
+			.attr("width", plotAreaWidth)
+			.attr("height", plotAreaHeight)
+			.attr("transform", "translate(" + visMargin.left + "," + visMargin.top + ")");
+
+		//Y Axis
+		//define a Y Axis scale
+		var yAxisLabelMargin = 20;
+		var xAxisLabelsHeight = 60;
+		var yAxisRange = plotAreaHeight - xAxisLabelsHeight;
+		var yAxisScale = d3.scale.linear().rangeRound([yAxisRange, 0]);
+		//get the max value from all the measures
+		var max = d3.max(csvData, function(d) {
+			return d3.max(mset1, function(m) {
+				return d[m];
+			}, mset2, function(m) {
+				return d[m];
+			});
+		});
+		//assign domain with 20% for extra spacing
+		yAxisScale.domain([0, max * 1.20]);
+
+		//Y Axis Line
+		var visPlotArea_Yaxis = visPlotArea
+			.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis")
+			.attr("transform", "translate(" + yAxisLabelMargin + "," + 0 + ")");
+		visPlotArea_Yaxis.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Line")
+			.append("line")
+			.attr("x1", 0)
+			.attr("y1", 0)
+			.attr("x2", 0)
+			.attr("y2", yAxisRange);
+
+		var numberOfTicks = max * 1.20 / yAxisScale(1000);
+		var ticks = [];
+		for (var i = 0; i < numberOfTicks; i++) {
+			var tick = {
+				id: i + 1,
+				label: (i + 1).toString() + "k"
+			};
+			ticks.push(tick);
+		}
+
+		//Y Axis Grid Lines
+		var visYAxisGridLine = visPlotArea_Yaxis.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_GridLines");
+		visYAxisGridLine.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_GridLine_Line")
+			.data(ticks)
+			.enter().append("line")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_GridLine_Line")
+			.attr("x1", 0)
+			.attr("y1", function(d) {
+				return yAxisScale(d.id * 1000);
+			})
+			.attr("x2", plotAreaWidth)
+			.attr("y2", function(d) {
+				return yAxisScale(d.id * 1000);
+			});
+
+		//Y Axis Ticks
+		var visYAxisTicks = visPlotArea_Yaxis.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Ticks");
+		visYAxisTicks.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Ticks_Line")
+			.data(ticks)
+			.enter().append("line")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Ticks_Line")
+			.attr("x1", 0)
+			.attr("y1", function(d) {
+				return yAxisScale(d.id * 1000);
+			})
+			.attr("x2", -5)
+			.attr("y2", function(d) {
+				return yAxisScale(d.id * 1000);
+			});
+
+		//Y Axis Tick Labels
+		var visYAxisLabels = visPlotArea_Yaxis.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Labels");
+		visYAxisLabels.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Labels_Text")
+			.data(ticks)
+			.enter().append("text")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis_Labels_Text")
+			.attr("x", 0 - 20)
+			.attr("y", function(d) {
+				return yAxisScale(d.id * 1000);
+			})
+			.text(function(d) {
+				return d.label;
+			});
+
+		//X Axis
+		//define X Axis scale
+
+		var xAxisScaleLowestDim = d3.scale.ordinal()
+			.rangeRoundBands([0, plotAreaWidth]);
+		xAxisScaleLowestDim.domain(csvData.map(function(d) {
+			// return d[dset[0]] + d[dset[1]] +  d[dset[2]] ;
+			var cd = '';
+			for (var j = 0; j < dset.length; j++) {
+				cd = cd + d[dset[j]];
 			}
+			return cd;
+		}));
 
-			//X Axis
-			//define X Axis scale
+		//X Axis Line
+		var visPlotArea_Xaxis = visPlotArea
+			.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis")
+			.attr("transform", "translate(" + 20 + "," + 0 + ")");
+		visPlotArea_Xaxis.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Line")
+			.append("line")
+			.attr("x1", 0)
+			.attr("y1", plotAreaHeight - xAxisLabelsHeight)
+			.attr("x2", plotAreaWidth)
+			.attr("y2", plotAreaHeight - xAxisLabelsHeight);
 
-			var xAxisScaleLowestDim = d3.scale.ordinal()
-				.rangeRoundBands([0, plotAreaWidth]);
-			xAxisScaleLowestDim.domain(csvData.map(function(d) {
+		//X Axis Ticks
+		var visXAxisTicks = visPlotArea_Yaxis.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks");
+		//first tick
+		visXAxisTicks
+			.append("line")
+			.attr("x1", 0)
+			.attr("y1", plotAreaHeight - xAxisLabelsHeight)
+			.attr("x2", 0)
+			.attr("y2", plotAreaHeight);
+
+		//ticks for the lowest dimension
+		var visXAxisTicksLowestDim = visXAxisTicks.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_LowestDim");
+		visXAxisTicksLowestDim.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_LowestDim")
+			.data(csvData)
+			.enter().append("line")
+			.attr("x1", function(d) {
 				var cd = '';
 				for (var j = 0; j < dset.length; j++) {
 					cd = cd + d[dset[j]];
 				}
-				return cd;
-			}));
+				return xAxisScaleLowestDim(cd) + xAxisScaleLowestDim.rangeBand();
+			})
+			.attr("y1", plotAreaHeight - xAxisLabelsHeight)
+			.attr("x2", function(d) {
+				var cd = '';
+				for (var j = 0; j < dset.length; j++) {
+					cd = cd + d[dset[j]];
+				}
+				return xAxisScaleLowestDim(cd) + xAxisScaleLowestDim.rangeBand();
+			})
+			.attr("y2", plotAreaHeight - (xAxisLabelsHeight - 5));
 
-			//X Axis Line
-			var visPlotArea_Xaxis = visPlotArea
-				.append("g")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis")
-				.attr("transform", "translate(" + 0 + "," + (plotAreaHeight - xAxisLabelsHeight) + ")");
-			visPlotArea_Xaxis.append("g")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Line")
-				.append("line")
-				.attr("x1", 0)
-				.attr("y1", 0)
-				.attr("x2", plotAreaWidth)
-				.attr("y2", 0);
+		//find the string pixel length
+		var pixelLength = function(str) {
+			var canvas = document.createElement('canvas');
+			var ctx = canvas.getContext("2d");
+			ctx.font = "10px 'Open Sans', Arial, Helvetica, sans-serif";
+			return ctx.measureText(str).width;
+		};
 
-			//X Axis Ticks
-			var visXAxisTicks = visPlotArea_Xaxis.append("g")
+		//labels for the lowest dimension
+		var visXAxisLabelsLowestDim = visPlotArea_Xaxis.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels");
+		visXAxisLabelsLowestDim.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels_Text")
+			.data(csvData)
+			.enter().append("text")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels_Text")
+			.attr("x", function(d) {
+				var cd = '';
+				for (var j = 0; j < dset.length; j++) {
+					cd = cd + d[dset[j]];
+				}
+				// return xAxisScaleLowestDim(cd) + ((xAxisScaleLowestDim.rangeBand()) / 4);
+				var width = pixelLength(d[dset[dset.length - 1]]);
+				return xAxisScaleLowestDim(cd) + ((xAxisScaleLowestDim.rangeBand() - width) / 2);
+				//return xAxisScaleLowestDim(cd) + ((xAxisScaleLowestDim.rangeBand() - (d[dset[dset.length - 1]].length * 10)) / 2);
+			})
+			.attr("y", plotAreaHeight - (xAxisLabelsHeight - 20))
+			.text(function(d) {
+				return d[dset[dset.length - 1]];
+			});
+
+		//ticks and labels for all the lower dimensions
+		for (var j = 0; j < dset.length - 1; j++) {
+			var dimensions = [];
+			var dimCount = [];
+			var dimLabels = [];
+
+			csvData.forEach(function(d) {
+				var cd = '';
+				var label = '';
+				for (var l = 0; l <= j; l++) {
+					cd = cd + d[dset[l]];
+					label = d[dset[j]];
+				}
+				var index = dimensions.indexOf(cd);
+				if (index <= -1) {
+					dimensions.push(cd);
+					if (dimCount.length > 0) {
+						dimCount.push(1 + dimCount[dimCount.length - 1]);
+					} else {
+						dimCount.push(1);
+					}
+					dimLabels.push(label);
+				} else {
+					dimCount[index] = dimCount[index] + 1;
+				}
+			});
+
+			var tickHeightVar = 0,
+				labelHeightVar = 0;
+			if (j == 0) {
+				tickHeightVar = xAxisLabelsHeight - 60;
+				labelHeightVar = xAxisLabelsHeight - 60;
+			} else {
+				tickHeightVar = xAxisLabelsHeight - 40;
+				labelHeightVar = xAxisLabelsHeight - 40;
+			}
+
+			var dimInfoArr = [];
+			dimCount.forEach(function(d) {
+
+				var dimInfo = {};
+				dimInfo.dimensions = dimensions[dimCount.indexOf(d)];
+				if (dimCount.indexOf(d) > 0) {
+					dimInfo.dimCount = dimCount[dimCount.indexOf(d)] - dimCount[dimCount.indexOf(d) - 1];
+				} else {
+					dimInfo.dimCount = dimCount[dimCount.indexOf(d)];
+				}
+				dimInfo.dimCountPrev = dimCount[dimCount.indexOf(d) - 1];
+				dimInfo.dimLabels = dimLabels[dimCount.indexOf(d)];
+
+				dimInfoArr.push(dimInfo);
+			});
+
+			var visXAxisTicksDim = visXAxisTicks.append("g")
 				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks");
-			//first tick
-			visXAxisTicks
-				.append("line")
-				.attr("x1", 0)
-				.attr("y1", 0)
-				.attr("x2", 0)
-				.attr("y2", xAxisLabelsHeight);
-
-			//ticks for the lowest dimension
-			var visXAxisTicksLowestDim = visXAxisTicks.append("g")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_LowestDim");
-			visXAxisTicksLowestDim.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_LowestDim")
-				.data(csvData)
+			visXAxisTicksDim.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_Dim")
+				.data(dimCount)
 				.enter().append("line")
-				.attr("x1", function(d, i) {
-					// var cd = '';
-					// for (var j = 0; j < dset.length; j++) {
-					// 	cd = cd + d[dset[j]];
-					// }
-					// return xAxisScaleLowestDim(cd) + xAxisScaleLowestDim.rangeBand();
-					return i * xAxisScaleLowestDim.rangeBand();
+				.attr("x1", function(d) {
+					return xAxisScaleLowestDim.rangeBand() * d;
 				})
-				.attr("y1", 0)
-				.attr("x2", function(d, i) {
-					// var cd = '';
-					// for (var j = 0; j < dset.length; j++) {
-					// 	cd = cd + d[dset[j]];
-					// }
-					// return xAxisScaleLowestDim(cd) + xAxisScaleLowestDim.rangeBand();
-					return i * xAxisScaleLowestDim.rangeBand();
+				.attr("y1", plotAreaHeight - xAxisLabelsHeight)
+				.attr("x2", function(d) {
+					return xAxisScaleLowestDim.rangeBand() * d;
 				})
-				.attr("y2", 5);
+				.attr("y2", plotAreaHeight - tickHeightVar);
 
-			//labels for the lowest dimension
-			var visXAxisLabelsLowestDim = visPlotArea_Xaxis.append("g")
+			var visXAxisLabels = visPlotArea_Xaxis.append("g")
 				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels");
-			visXAxisLabelsLowestDim.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels_Text")
-				.data(csvData)
+			visXAxisLabels.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels_Text")
+				.data(dimInfoArr)
 				.enter().append("text")
 				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels_Text")
+				.attr("x", function(d) {
+					var width = pixelLength(d.dimLabels);
+					if (d.dimCountPrev) {
+						return (xAxisScaleLowestDim.rangeBand() * d.dimCountPrev) + (((xAxisScaleLowestDim.rangeBand() * d.dimCount) - width) / 2);
+					} else {
+						return ((xAxisScaleLowestDim.rangeBand() * d.dimCount) - width) / 2;
+					}
+				})
+				.attr("y", plotAreaHeight - labelHeightVar)
+				.text(function(d) {
+					return d.dimLabels;
+				});
+		}
+
+		/*------------------------------------------------------------Bars-------------------------------------------------------------------------- */
+		
+		//for measure set 1
+		mset1.forEach(function(d, index) {
+			var measName = mset1[index];
+			var measNamesPrev = [];
+			for (var i = 0; i < index; i++) {
+				measNamesPrev.push(mset1[i]);
+			}
+			visPlotArea.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Bars")
+				.data(csvData)
+				.enter().append("rect")
+				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Bars")
+				.attr("height", function(d) {
+					return plotAreaHeight - xAxisLabelsHeight - yAxisScale(d[measName]);
+				})
+				.attr("width", xAxisScaleLowestDim.rangeBand() / 4)
 				.attr("x", function(d) {
 					var cd = '';
 					for (var j = 0; j < dset.length; j++) {
 						cd = cd + d[dset[j]];
 					}
-					// return xAxisScaleLowestDim(cd) + ((xAxisScaleLowestDim.rangeBand()) / 4);
-					var width = util.pixelLength(d[dset[dset.length - 1]]);
-					return xAxisScaleLowestDim(cd) + ((xAxisScaleLowestDim.rangeBand() - width) / 2);
-					//return xAxisScaleLowestDim(cd) + ((xAxisScaleLowestDim.rangeBand() - (d[dset[dset.length - 1]].length * 10)) / 2);
+					return xAxisScaleLowestDim(cd) + (xAxisScaleLowestDim.rangeBand() / 4) + yAxisLabelMargin;
 				})
-				.attr("y", (xAxisLabelsHeight - 40))
-				.text(function(d) {
-					return d[dset[dset.length - 1]];
-				});
-
-			//ticks and labels for all the higher dimensions
-			for (var j = 0; j < dset.length - 1; j++) {
-				var dimensions = [];
-				var dimCount = [];
-				var dimLabels = [];
-
-				csvData.forEach(function(d) {
-					var cd = '';
-					var label = '';
-					for (var l = 0; l <= j; l++) {
-						cd = cd + d[dset[l]];
-						label = d[dset[j]];
+				.attr("y", function(d) {
+					var axisCorr = 0;
+					for (var i = 0; i < measNamesPrev.length; i++) {
+						axisCorr = axisCorr + d[measNamesPrev[i]];
 					}
-					var index = dimensions.indexOf(cd);
-					if (index <= -1) {
-						dimensions.push(cd);
-						if (dimCount.length > 0) {
-							dimCount.push(1 + dimCount[dimCount.length - 1]);
-						} else {
-							dimCount.push(1);
-						}
-						dimLabels.push(label);
+					return yAxisScale(d[measName] + axisCorr);
+				})
+				.attr("fill", function(d) {
+					if (d[dset[1]] == ".YTD") {
+						return "#595959";
 					} else {
-						dimCount[index] = dimCount[index] + 1;
+						return "#005284";
 					}
-				});
-
-				var tickHeightVar = 0,
-					labelHeightVar = 0;
-				if (j == 0) {
-					tickHeightVar = 60;
-					labelHeightVar = xAxisLabelsHeight;
-				} else {
-					tickHeightVar = 40;
-					labelHeightVar = xAxisLabelsHeight - 20;
-				}
-
-				var dimInfoArr = [];
-				dimCount.forEach(function(d) {
-
-					var dimInfo = {};
-					dimInfo.dimensions = dimensions[dimCount.indexOf(d)];
-					if (dimCount.indexOf(d) > 0) {
-						dimInfo.dimCount = dimCount[dimCount.indexOf(d)] - dimCount[dimCount.indexOf(d) - 1];
-					} else {
-						dimInfo.dimCount = dimCount[dimCount.indexOf(d)];
-					}
-					dimInfo.dimCountPrev = dimCount[dimCount.indexOf(d) - 1];
-					dimInfo.dimLabels = dimLabels[dimCount.indexOf(d)];
-
-					dimInfoArr.push(dimInfo);
-				});
-
-				var visXAxisTicksDim = visXAxisTicks.append("g")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks");
-				visXAxisTicksDim.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_Dim")
-					.data(dimCount)
-					.enter().append("line")
-					.attr("x1", function(d) {
-						return xAxisScaleLowestDim.rangeBand() * d;
-					})
-					.attr("y1", 0)
-					.attr("x2", function(d) {
-						return xAxisScaleLowestDim.rangeBand() * d;
-					})
-					.attr("y2", tickHeightVar);
-
-				var visXAxisLabels = visPlotArea_Xaxis.append("g")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels");
-				visXAxisLabels.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels_Text")
-					.data(dimInfoArr)
-					.enter().append("text")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Labels_Text")
-					.attr("x", function(d) {
-						var width = util.pixelLength(d.dimLabels);
-						if (d.dimCountPrev) {
-							return (xAxisScaleLowestDim.rangeBand() * d.dimCountPrev) + (((xAxisScaleLowestDim.rangeBand() * d.dimCount) - width) / 2);
-						} else {
-							return ((xAxisScaleLowestDim.rangeBand() * d.dimCount) - width) / 2;
-						}
-					})
-					.attr("y", labelHeightVar)
-					.text(function(d) {
-						return d.dimLabels;
-					});
-			}
-
-			/*------------------------------------------------------------Bars-------------------------------------------------------------------------- */
-
-			//for measure set 1
-			mset1.forEach(function(d, index) {
-				var measName = mset1[index];
-				var measNamesPrev = [];
-				for (var i = 0; i < index; i++) {
-					measNamesPrev.push(mset1[i]);
-				}
-				visPlotArea.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Bars")
-					.data(csvData)
-					.enter().append("rect")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Bars")
-					.attr("height", function(d) {
-						return plotAreaHeight - xAxisLabelsHeight - yAxisScale(d[measName]);
-					})
-					.attr("width", xAxisScaleLowestDim.rangeBand() / 4)
-					.attr("x", function(d) {
-						var cd = '';
-						for (var j = 0; j < dset.length; j++) {
-							cd = cd + d[dset[j]];
-						}
-						return xAxisScaleLowestDim(cd) + (xAxisScaleLowestDim.rangeBand() / 4);
-					})
-					.attr("y", function(d) {
-						var axisCorr = 0;
-						for (var i = 0; i < measNamesPrev.length; i++) {
-							axisCorr = axisCorr + d[measNamesPrev[i]];
-						}
-						return yAxisScale(d[measName] + axisCorr);
-					})
-					.attr("fill", function(d) {
-						if (d[dset[1]] == ".YTD") {
-							return "#595959";
-						} else {
-							return "#005284";
-						}
-					})
-					.append("title")
-					.text(function(d) {
-						return measName + ": " + parseFloat(d[measName]).toFixed(2);
-					});
-			});
-
-			//for measure set 2
-			mset2.forEach(function(d, index) {
-				var measName = mset2[index];
-				var measNamesPrev = [];
-				for (var i = 0; i < index; i++) {
-					measNamesPrev.push(mset2[i]);
-				}
-				visPlotArea.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Bars")
-					.data(csvData)
-					.enter().append("rect")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Bars")
-					.attr("height", function(d) {
-						return plotAreaHeight - xAxisLabelsHeight - yAxisScale(d[measName]);
-					})
-					.attr("width", xAxisScaleLowestDim.rangeBand() / 4)
-					.attr("x", function(d) {
-						var cd = '';
-						for (var j = 0; j < dset.length; j++) {
-							cd = cd + d[dset[j]];
-						}
-						return xAxisScaleLowestDim(cd) + ((xAxisScaleLowestDim.rangeBand() / 4) * 2);
-					})
-					.attr("y", function(d) {
-						var axisCorr = 0;
-						for (var i = 0; i < measNamesPrev.length; i++) {
-							axisCorr = axisCorr + d[measNamesPrev[i]];
-						}
-						return yAxisScale(d[measName] + axisCorr);
-					})
-					.attr("fill", function(d) {
-						if (index == 0) {
-							if (d[dset[1]] == ".YTD") {
-								return "#B1B3B4";
-							} else {
-								return "#79CCFF";
-							}
-						} else {
-							if (d[dset[1]] == ".YTD") {
-								return "#000000";
-							} else {
-								return "#006DB0";
-							}
-						}
-					})
-					.append("title")
-					.text(function(d) {
-						return measName + ": " + parseFloat(d[measName]).toFixed(2);
-					});
-			});
-
-			//75% utilization line
-			var kpiLabel = "75% of avg. yearly Capacity: ";
-			visPlotArea.append("g")
-				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Utilization_RefLine")
-				.attr("transform", "translate(" + 0 + "," + 0 + ")")
-				.append("line")
-				.attr("x1", 0)
-				.attr("y1", yAxisScale(capacityKpi))
-				.attr("x2", plotAreaWidth)
-				.attr("y2", yAxisScale(capacityKpi))
+				})
 				.append("title")
-				.text(kpiLabel + parseFloat(capacityKpi).toFixed(2));
-
-			/*-------------------------------------------------------------End of Bars-------------------------------------------------------------------------- */
-
-			/*----------------------------------------------------------------Legend---------------------------------------------------------------------------- */
-
-			if (legendVisibility === true) {
-				var legendElements = [];
-				mset1.forEach(function(d) {
-					var legendElement = {
-						legendColor: "#595959",
-						legendText: d + " (Actual)"
-					};
-					legendElements.push(legendElement);
-
-					legendElement = {
-						legendColor: "#005284",
-						legendText: d + " (Future)"
-					};
-					legendElements.push(legendElement);
+				.text(function(d) {
+					return measName + ": " + d[measName];
 				});
+		});
 
-				mset2.forEach(function(d, index) {
-					if (index == 0) {
-						var legendElement = {
-							legendColor: "#B1B3B4",
-							legendText: d + " (Actual)"
-						};
-						legendElements.push(legendElement);
-
-						legendElement = {
-							legendColor: "#79CCFF",
-							legendText: d + " (Future)"
-						};
-						legendElements.push(legendElement);
-					} else {
-						var legendElement = {
-							legendColor: "#006DB0",
-							legendText: d
-						};
-						legendElements.push(legendElement);
-					}
-				});
-
-				var legendWidth = visWidth - plotAreaWidth;
-				var legendHeight = visHeight / 2 - visMargin.top;
-
-				var visLegend = vis.append("g")
-					.attr('class', 'camelot_viz_ext_stackedparallelcolumnchart_visLegend')
-					.attr("width", legendWidth)
-					.attr("height", legendHeight)
-					.attr("transform", "translate(" + (defaultMargin.left + visMargin.left + 20 + plotAreaWidth) + "," + (visMargin.top +
-							defaultMargin.top) +
-						")");
-
-				var legendElementWidth = (plotAreaHeight / 50 > 5) ? 10 : 5;
-				var xDistBetweenElements = legendElementWidth / 2;
-				var legendElementHeight = legendElementWidth;
-				var yDistBetweenElements = legendElementWidth;
-
-				var legendTextSize = (legendElementHeight >= 10) ? legendElementHeight : 10;
-
-				var legend = visLegend
-					.selectAll(".camelot_viz_ext_stackedparallelcolumnchart_visLegend_legend")
-					.data(legendElements)
-					.enter().append("g")
-					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visLegend_legend")
-					.attr("transform", function(d, i) {
-						return "translate(0," + (i * (legendElementHeight + yDistBetweenElements)) + ")";
-					});
-
-				legend.append("rect")
-					.attr("x", 0)
-					.attr("height", legendElementWidth)
-					.attr("width", legendElementHeight)
-					.attr("fill", function(d) {
-						return d.legendColor;
-					});
-
-				legend.append("text")
-					.attr("x", legendElementWidth + xDistBetweenElements)
-					.attr("y", 0 + legendElementHeight)
-					.text(function(d) {
-						return d.legendText;
-					})
-					.attr("font-size", legendTextSize);
-
-				legendElements = [];
-				//add legend element for the capacity KPI
-				var legendElement = {
-					legendColor: "#79CCFF",
-					legendText: "75% of avg. yearly eff. Capacity"
-				};
-				legendElements.push(legendElement);
-				var kpiLegend = "75% of avg. yearly eff. Capacity ";
-
-				visLegend.append("line")
-					.attr("x1", 0)
-					.attr("y1", 5 * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2)
-					.attr("x2", legendElementWidth)
-					.attr("y2", 5 * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2);
-				// visLegend.append("g")
-				// 	.attr("transform", "translate(" + (legendElementWidth + xDistBetweenElements) + "," + ((5 * (legendElementHeight +
-				// 		yDistBetweenElements)) + legendElementHeight) + ")")
-				// 	.append("html")
-				// 	.text("test" + "test");
-				visLegend.append("text")
-					.attr("x", legendElementWidth + xDistBetweenElements)
-					.attr("y", (5 * (legendElementHeight + yDistBetweenElements)) + legendElementHeight)
-					.text(kpiLegend)
-					.attr("font-size", legendTextSize);
+		//for measure set 2
+		mset2.forEach(function(d, index) {
+			var measName = mset2[index];
+			var measNamesPrev = [];
+			for (var i = 0; i < index; i++) {
+				measNamesPrev.push(mset2[i]);
 			}
+			visPlotArea.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Bars")
+				.data(csvData)
+				.enter().append("rect")
+				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Bars")
+				.attr("height", function(d) {
+					return plotAreaHeight - xAxisLabelsHeight - yAxisScale(d[measName]);
+				})
+				.attr("width", xAxisScaleLowestDim.rangeBand() / 4)
+				.attr("x", function(d) {
+					var cd = '';
+					for (var j = 0; j < dset.length; j++) {
+						cd = cd + d[dset[j]];
+					}
+					return xAxisScaleLowestDim(cd) + ((xAxisScaleLowestDim.rangeBand() / 4) * 2) + yAxisLabelMargin;
+				})
+				.attr("y", function(d) {
+					var axisCorr = 0;
+					for (var i = 0; i < measNamesPrev.length; i++) {
+						axisCorr = axisCorr + d[measNamesPrev[i]];
+					}
+					return yAxisScale(d[measName] + axisCorr);
+				})
+				.attr("fill", function(d) {
+					if (index == 0) {
+						if (d[dset[1]] == ".YTD") {
+							return "#B1B3B4";
+						} else {
+							return "#79CCFF";
+						}
+					} else {
+						if (d[dset[1]] == ".YTD") {
+							return "#ff0000";
+						} else {
+							return "#006DB0";
+						}
+					}
+				})
+				.append("title")
+				.text(function(d) {
+					return measName + ": " + d[measName];
+				});
+		});
 
-			/*-------------------------------------------------------------End of Legend------------------------------------------------------------------------ */
+		/*-------------------------------------------------------------End of Bars-------------------------------------------------------------------------- */
 
-			/* -------------------------------------------------------------End of Plot Area-------------------------------------------------------------------------- */
+		/* -------------------------------------------------------------End of Plot Area-------------------------------------------------------------------------- */
 
-		};
+	};
 
-		return render;
-	});
+	return render;
+});
+
+/* Commented code
+				var yAxis = d3.svg.axis()
+				.scale(yAxisScale)
+				.orient("left")
+				.tickFormat(d3.format(".1s"))
+				.tickSize(1);
+			
+			visPlotArea.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Yaxis")
+			.call(yAxis); 
+			
+			var xAxisScaleTest = d3.scale.ordinal()
+				.rangeRoundBands([0, plotAreaWidth]);
+			xAxisScaleTest.domain(csvData.map(function(d) {
+					return d[dset[2]];
+				})
+			);
+				
+			var xAxisTest = d3.svg.axis()
+				.scale(xAxisScaleTest)
+				.orient("bottom")
+				.tickFormat(d3.format(".1s"))
+				.tickSize(1);
+			
+			visPlotArea.append("g")
+			.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis")
+			.attr("transform", "translate(" + 20 + "," + 0 + ")")
+			.call(xAxisTest);
+			
+			
+				var xAxisScaleDim3 = d3.scale.ordinal()
+				.rangeRoundBands([0, plotAreaWidth]);
+			xAxisScaleDim3.domain(csvData.map(function(d) {
+					// return d[dset[0]] + d[dset[1]] +  d[dset[2]] ;
+					var cd = '';
+					for(var j = 0; j < dset.length; j++) {
+						cd = cd + d[dset[j]];
+					}	
+					return cd;
+				}));
+			
+			var xAxisScaleDim2 = d3.scale.ordinal()
+				.rangeRoundBands([0, plotAreaWidth]);
+			xAxisScaleDim2.domain(csvData.map(function(d) {
+					return d[dset[0]] + d[dset[1]] ;
+				}));
+				
+			var xAxisScaleDim1 = d3.scale.ordinal()
+				.rangeRoundBands([0, plotAreaWidth]);
+			xAxisScaleDim1.domain(csvData.map(function(d) {
+					return d[dset[0]];
+				}));
+				
+				/*
+			//ticks for the second dimension
+			var visXAxisTicksDim2 = visXAxisTicks.append("g")
+				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_Dim2");
+			visXAxisTicksDim2.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_Dim2")
+				.data(csvData)
+				.enter().append("line")
+				.attr("x1", function(d) {
+					return xAxisScaleDim2(d[dset[0]] + d[dset[1]]) + xAxisScaleDim2.rangeBand();
+					// return xAxisScaleDim2.rangeBand() * 6;
+				})
+				.attr("y1", plotAreaHeight - xAxisLabelsHeight)
+				.attr("x2", function(d) {
+					return xAxisScaleDim2(d[dset[0]] + d[dset[1]]) + xAxisScaleDim2.rangeBand();
+					// return xAxisScaleDim2.rangeBand() * 6;
+				})
+				.attr("y2", plotAreaHeight - (xAxisLabelsHeight - 50));
+			
+			
+			//ticks for the first dimension
+			var visXAxisTicksDim1 = visXAxisTicks.append("g")
+				.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_Dim1");
+			visXAxisTicksDim1.selectAll("camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Xaxis_Ticks_Dim1")
+				.data(csvData)
+				.enter().append("line")
+				.attr("x1", function(d) {
+					return xAxisScaleDim1(d[dset[0]]) + xAxisScaleDim1.rangeBand();
+				})
+				.attr("y1", plotAreaHeight - xAxisLabelsHeight)
+				.attr("x2", function(d) {
+					return xAxisScaleDim1(d[dset[0]]) + xAxisScaleDim1.rangeBand();
+				})
+				.attr("y2", plotAreaHeight);
+			*/
