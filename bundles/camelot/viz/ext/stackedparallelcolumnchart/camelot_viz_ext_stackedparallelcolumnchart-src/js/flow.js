@@ -127,6 +127,42 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/flow", ["camelot_viz_e
 				}
 			}
 		});
+		
+			element.addProperty({
+			name: "group",
+			type: "Object",
+			supportedValues: {
+				visible: {
+					name: "visible",
+					type: "Boolean",
+					supportedValues: [true, false]
+				}
+			}
+		});
+		
+			element.addProperty({
+			name: "mc",
+			type: "Object",
+			supportedValues: {
+				visible: {
+					name: "visible",
+					type: "Boolean",
+					supportedValues: [true, false]
+				}
+			}
+		});
+		
+			element.addProperty({
+			name: "itlab",
+			type: "Object",
+			supportedValues: {
+				visible: {
+					name: "visible",
+					type: "Boolean",
+					supportedValues: [true, false]
+				}
+			}
+		});
 
 	};
 	flowRegisterFunc.id = "camelot.viz.ext.stackedparallelcolumnchart";

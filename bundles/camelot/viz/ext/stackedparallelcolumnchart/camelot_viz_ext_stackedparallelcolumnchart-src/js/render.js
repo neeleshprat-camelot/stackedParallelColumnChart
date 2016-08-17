@@ -60,12 +60,32 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 
 			/* --------------------------------------------------------------------Plot Area-------------------------------------------------------------------------- */
 
+			//visibility of several chart properties
 			var properties = this.properties();
 			var gridLinesVisibility = properties.gridline && (properties.gridline.visible != null) ? properties.gridline.visible : true;
 			var legendVisibility = properties.legend && (properties.legend.visible != null) ? properties.legend.visible : true;
 			var yAxisLineVisibility = properties.yAxisLine && (properties.yAxisLine.visible != null) ? properties.yAxisLine.visible : true;
 			var yAxisLabelVisible = properties.yAxisLabel && (properties.yAxisLabel.visible != null) ? properties.yAxisLabel.visible : true;
 			var capaKPIVisible = properties.capacitykpi && (properties.capacitykpi.visible != null) ? properties.capacitykpi.visible : true;
+
+			var group = properties.group && (properties.group.visible != null) ? properties.group.visible : true;
+			var mc = properties.mc && (properties.mc.visible != null) ? properties.mc.visible : true;
+			var it = properties.itlab && (properties.itlab.visible != null) ? properties.itlab.visible : true;
+
+			var color = d3.scale.ordinal().range(["#0f75d2", "#6face4", "#799fcf", "#a6bfdf"]);
+			var opporutnityColor  = "#fdff92";
+			var capaKPIcolor = "#79CCFF";
+
+			if (group) {
+				//variations of medium blue
+				color = d3.scale.ordinal().range(["#0f75d2", "#6face4", "#799fcf", "#a6bfdf"]);
+			} else if (mc) {
+				//variations of dark blue
+				color = d3.scale.ordinal().range(["#0a5193", "#0c5da8", "#0d69bd", "#566983"]);
+			} else if (it) {
+				//variations of gray
+				color = d3.scale.ordinal().range(["#666666", "#999999", "#b2b2b2", "#cccccc"]);
+			}
 
 			//define default margin with some standard top, bottom, right, left values
 			var defaultMargin = {
@@ -407,11 +427,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_tooltip_container-rect")
 					.attr("x", position[0] - 5)
 					.attr("y", position[1] - 10)
-					.attr("height", 30)
-					.attr("fill", "#F9FBF7")
-					.attr("stroke", "#000")
-					.attr("stroke-width", 0.1)
-					.style("opacity", 1);
+					.attr("height", 30);
 
 				var tooltip_text = tooltip.append("text")
 					.attr("x", position[0])
@@ -454,12 +470,8 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 						}
 						return yAxisScale(d[measName] + axisCorr);
 					})
-					.attr("fill", function(d) {
-						if (d[dset[1]] == ".YTD") {
-							return "#595959";
-						} else {
-							return "#005284";
-						}
+					.attr("fill", function(d, i) {
+						return color(index);
 					})
 					.on("mouseover", function(d) {
 						mouseOver(measName, d[measName], this);
@@ -499,18 +511,10 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 						return yAxisScale(d[measName] + axisCorr);
 					})
 					.attr("fill", function(d) {
-						if (index == 0) {
-							if (d[dset[1]] == ".YTD") {
-								return "#B1B3B4";
-							} else {
-								return "#79CCFF";
-							}
+						if (index == 1) {
+							return opporutnityColor;
 						} else {
-							if (d[dset[1]] == ".YTD") {
-								return "#000000";
-							} else {
-								return "#006DB0";
-							}
+							return color(index + mset1.length);
 						}
 					})
 					.on("mouseover", function(d) {
@@ -532,6 +536,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					.attr("y1", yAxisScale(capacityKpi))
 					.attr("x2", plotAreaWidth)
 					.attr("y2", yAxisScale(capacityKpi))
+					.attr("fill", capacityKpi)
 					.on("mouseover", function(d) {
 						mouseOver(kpiLabel, parseFloat(capacityKpi).toFixed(2), this);
 					})
@@ -546,16 +551,10 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 
 			if (legendVisibility === true) {
 				var legendElements = [];
-				mset1.forEach(function(d) {
+				mset1.forEach(function(d, index) {
 					var legendElement = {
-						legendColor: "#595959",
-						legendText: d + " (Actual)"
-					};
-					legendElements.push(legendElement);
-
-					legendElement = {
-						legendColor: "#005284",
-						legendText: d + " (Future)"
+						legendColor: color(index),
+						legendText: d
 					};
 					legendElements.push(legendElement);
 				});
@@ -563,19 +562,13 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 				mset2.forEach(function(d, index) {
 					if (index == 0) {
 						var legendElement = {
-							legendColor: "#B1B3B4",
-							legendText: d + " (Actual)"
-						};
-						legendElements.push(legendElement);
-
-						legendElement = {
-							legendColor: "#79CCFF",
-							legendText: d + " (Future)"
+							legendColor: color(index + mset1.length),
+							legendText: d
 						};
 						legendElements.push(legendElement);
 					} else {
 						var legendElement = {
-							legendColor: "#006DB0",
+							legendColor: opporutnityColor,
 							legendText: d
 						};
 						legendElements.push(legendElement);
@@ -628,7 +621,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 				legendElements = [];
 				//add legend element for the capacity KPI
 				var legendElement = {
-					legendColor: "#79CCFF",
+					legendColor: capaKPIcolor,
 					legendText: "75% of avg. yearly eff. Capacity"
 				};
 				legendElements.push(legendElement);
@@ -636,17 +629,12 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 
 				visLegend.append("line")
 					.attr("x1", 0)
-					.attr("y1", 5 * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2)
+					.attr("y1", 3 * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2)
 					.attr("x2", legendElementWidth)
-					.attr("y2", 5 * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2);
-				// visLegend.append("g")
-				// 	.attr("transform", "translate(" + (legendElementWidth + xDistBetweenElements) + "," + ((5 * (legendElementHeight +
-				// 		yDistBetweenElements)) + legendElementHeight) + ")")
-				// 	.append("html")
-				// 	.text("test" + "test");
+					.attr("y2", 3 * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2);
 				visLegend.append("text")
 					.attr("x", legendElementWidth + xDistBetweenElements)
-					.attr("y", (5 * (legendElementHeight + yDistBetweenElements)) + legendElementHeight)
+					.attr("y", (3 * (legendElementHeight + yDistBetweenElements)) + legendElementHeight)
 					.text(kpiLegend)
 					.attr("font-size", legendTextSize);
 			}

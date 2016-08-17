@@ -78,7 +78,10 @@
 }
 
 .camelot_viz_ext_stackedparallelcolumnchart_tooltip_container rect {
-	
+	fill: #ffffff;
+	stroke: #000;
+	stroke-width: 0.1;
+	opacity: 1;
 }
 
 .camelot_viz_ext_stackedparallelcolumnchart_tooltip_container text {

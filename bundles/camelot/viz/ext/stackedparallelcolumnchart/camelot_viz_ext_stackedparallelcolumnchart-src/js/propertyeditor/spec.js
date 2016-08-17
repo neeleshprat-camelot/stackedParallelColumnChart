@@ -57,8 +57,29 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/propertyeditor/spec", 
 							"id": "sap.viz.controls.propertyeditor.section.plotArea.group.capacitykpi.visible",
 							'renderer': checkBoxRenderer,
 							"config": {
-								"property": "plotArea.yAxisLabel.visible",
+								"property": "plotArea.capacitykpi.visible",
 								"label": "Show Capa. KPI Ref. Line"
+							}
+						}, {
+							"id": "sap.viz.controls.propertyeditor.section.plotArea.group.group.visible",
+							'renderer': checkBoxRenderer,
+							"config": {
+								"property": "plotArea.group.visible",
+								"label": "Group"
+							}
+						}, {
+							"id": "sap.viz.controls.propertyeditor.section.plotArea.group.mc.visible",
+							'renderer': checkBoxRenderer,
+							"config": {
+								"property": "plotArea.mc.visible",
+								"label": "MC"
+							}
+						}, {
+							"id": "sap.viz.controls.propertyeditor.section.plotArea.group.itlab.visible",
+							'renderer': checkBoxRenderer,
+							"config": {
+								"property": "plotArea.itlab.visible",
+								"label": "IT"
 							}
 						}]
 					}]
