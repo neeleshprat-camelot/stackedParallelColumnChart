@@ -1,120 +1,208 @@
 {
-  "generation": [
-    {
-      "templateId": "vizpacker.emptyProject",
-      "templateVersion": "0.0.1",
-      "dateTimeStamp": "Wed, 17 Aug 2016 09:15:30 GMT"
-    }
-  ],
-  "vizprojectmanager": {
-    "id": "camelot.viz.ext.stackedparallelcolumnchart",
-    "name": "Stacked Parallel Column Chart",
-    "version": "1.0.0",
-    "vendor": {
-      "name": "Camelot ITLab",
-      "url": "Your company website"
-    },
-    "description": " ",
-    "template": "standard",
-    "title": {
-      "enabled": true,
-      "place": "top",
-      "text": "Chart Title",
-      "alignment": "center"
-    },
-    "legend": {
-      "enabled": false,
-      "place": "right",
-      "title": {
-        "text": "City/Year"
-      }
-    },
-    "plot": {
-      "id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
-      "name": "Stacked Parallel Column Chart Module",
-      "feeds": {
-        "dimensionSets": [
-          {
-            "name": "X Axis",
-            "min": "0",
-            "max": "2",
-            "minStackedDims": "0",
-            "maxStackedDims": "Infinity",
-            "aaIndex": 1,
-            "id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.DS1",
-            "plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
-            "i": 1
-          }
-        ],
-        "measureSets": [
-          {
-            "name": "Y Axis 1",
-            "min": "0",
-            "max": "Infinity",
-            "mgIndex": 1,
-            "id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS1",
-            "plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
-            "i": 1
-          },
-          {
-            "min": "0",
-            "max": "Infinity",
-            "name": "Y Axis 2",
-            "id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS2",
-            "mgIndex": 2,
-            "type": "Measure",
-            "plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
-            "i": 2
-          }
-        ]
-      }
-    },
-    "data": {
-      "fileName": "CamelotColumnStackedChart_v3.csv",
-      "delimiter": ",",
-      "useFirstRowAsHeader": true,
-      "fields": [
-        "Month (TD)",
-        "Time Division",
-        "Year (TD)",
-        "Capacity",
-        "Forecast (excl. Opp.)",
-        "Opportunities"
-      ],
-      "types": [
-        "Dimension",
-        "Dimension",
-        "Dimension",
-        "Measure",
-        "Measure",
-        "Measure"
-      ]
-    },
-    "binding": {
-      "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS1": [
-        "Capacity"
-      ],
-      "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS2": [
-        "Forecast (excl. Opp.)",
-        "Opportunities"
-      ],
-      "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.DS1": [
-        "Year (TD)",
-        "Time Division",
-        "Month (TD)"
-      ]
-    },
-    "modelVersion": "0.0.2",
-    "requiresdkversion": "5.6.0",
-    "dataModel": "sap.viz.api.data.CrosstableDataset",
-    "container": "BorderSVGFlow",
-    "newExtensionAPI": false
-  },
-  "translation": {
-    "translationDomain": "",
-    "supportedLanguages": "en,fr,de",
-    "defaultLanguage": "en",
-    "defaultI18NPropertyFile": "i18n.properties",
-    "resourceModelName": "i18n"
-  }
+	"generation": [{
+		"templateId": "vizpacker.emptyProject",
+		"templateVersion": "0.0.1",
+		"dateTimeStamp": "Wed, 17 Aug 2016 09:15:30 GMT"
+	}],
+	"vizprojectmanager": {
+		"id": "camelot.viz.ext.stackedparallelcolumnchart",
+		"name": "Stacked Parallel Column Chart",
+		"version": "1.0.0",
+		"vendor": {
+			"name": "Camelot ITLab",
+			"url": "Your company website"
+		},
+		"description": " ",
+		"template": "standard",
+		"title": {
+			"enabled": true,
+			"place": "top",
+			"text": "Chart Title",
+			"alignment": "center"
+		},
+		"legend": {
+			"enabled": false,
+			"place": "right",
+			"title": {
+				"text": "City/Year"
+			}
+		},
+		"plot": {
+			"id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
+			"name": "Stacked Parallel Column Chart Module",
+			"feeds": {
+				"dimensionSets": [{
+					"name": "X Axis",
+					"min": "0",
+					"max": "2",
+					"minStackedDims": "0",
+					"maxStackedDims": "Infinity",
+					"aaIndex": 1,
+					"id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.DS1",
+					"plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
+					"i": 1
+				}],
+				"measureSets": [{
+					"name": "Y Axis 1",
+					"min": "0",
+					"max": "Infinity",
+					"mgIndex": 1,
+					"id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS1",
+					"plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
+					"i": 1
+				}, {
+					"min": "0",
+					"max": "Infinity",
+					"name": "Y Axis 2",
+					"id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS2",
+					"mgIndex": 2,
+					"type": "Measure",
+					"plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
+					"i": 2
+				}]
+			}
+		},
+		"data": {
+			"fileName": "CamelotColumnStackedChart_v3.csv",
+			"delimiter": ",",
+			"useFirstRowAsHeader": true,
+			"fields": [
+				"Month (TD)",
+				"Time Division",
+				"Year (TD)",
+				"Capacity",
+				"Forecast (excl. Opp.)",
+				"Opportunities"
+			],
+			"types": [
+				"Dimension",
+				"Dimension",
+				"Dimension",
+				"Measure",
+				"Measure",
+				"Measure"
+			]
+		},
+		"binding": {
+			"camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS1": [
+				"Capacity"
+			],
+			"camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS2": [
+				"Forecast (excl. Opp.)",
+				"Opportunities"
+			],
+			"camelot.viz.ext.stackedparallelcolumnchart.PlotModule.DS1": [
+				"Year (TD)",
+				"Time Division",
+				"Month (TD)"
+			]
+		},
+		"modelVersion": "0.0.2",
+		"requiresdkversion": "5.6.0",
+		"dataModel": "sap.viz.api.data.CrosstableDataset",
+		"container": "BorderSVGFlow",
+		"newExtensionAPI": false
+	}
+],
+"vizprojectmanager": {
+	"id": "camelot.viz.ext.parallelstackedchart",
+	"name": "parallelstackedchart",
+	"version": "1.0.0",
+	"vendor": {
+		"name": "Camelot ITLab",
+		"url": "Your company website"
+	},
+	"description": " ",
+	"template": "standard",
+	"title": {
+		"enabled": true,
+		"place": "top",
+		"text": "Chart Title",
+		"alignment": "center"
+	},
+	"legend": {
+		"enabled": true,
+		"place": "right",
+		"title": {
+			"text": "City/Year"
+		}
+	},
+	"plot": {
+		"id": "camelot.viz.ext.parallelstackedchart.PlotModule",
+		"name": "parallelstackedchart Module",
+		"feeds": {
+			"dimensionSets": [{
+				"id": "camelot.viz.ext.parallelstackedchart.PlotModule.DS1",
+				"name": "X Axis",
+				"type": "Dimension",
+				"role": "mark.color",
+				"min": 0,
+				"max": 2,
+				"aaIndex": 1
+			}],
+			"measureSets": [{
+				"id": "camelot.viz.ext.parallelstackedchart.PlotModule.MS1",
+				"name": "Y Axis",
+				"type": "Measure",
+				"role": "layout.value",
+				"min": 0,
+				"max": "Infinity",
+				"mgIndex": 1
+			}, {
+				"id": "camelot.viz.ext.parallelstackedchart.PlotModule.MS2",
+				"name": "Y Axis 2",
+				"type": "Measure",
+				"role": "layout.value",
+				"min": 0,
+				"max": "Infinity",
+				"mgIndex": 2
+			}]
+		}
+	},
+	"data": {
+		"fileName": "StackedChart4.csv",
+		"delimiter": ",",
+		"useFirstRowAsHeader": true,
+		"fields": [
+			"ZZ10DBKPI-CSKS_FUNC_AREA",
+			"ZZ10DBKPI-FC_INV_MNG",
+			"ZZ10DBKPI-PL_KAPA_EFF",
+			"Percent Utilization"
+		],
+		"types": [
+			"Dimension",
+			"Measure",
+			"Measure",
+			"Measure"
+		]
+	},
+	"binding": {
+		"camelot.viz.ext.parallelstackedchart.PlotModule.MS1": [
+			"ZZ10DBKPI-FC_INV_MNG",
+			"ZZ10DBKPI-PL_KAPA_EFF"
+		],
+		"camelot.viz.ext.parallelstackedchart.PlotModule.MS2": [
+			"Percent Utilization"
+		],
+		"camelot.viz.ext.parallelstackedchart.PlotModule.DS1": [
+			"ZZ10DBKPI-CSKS_FUNC_AREA"
+		]
+	},
+	"modelVersion": "0.0.2",
+	"requiresdkversion": "5.6.0",
+	"dataModel": "sap.viz.api.data.CrosstableDataset",
+	"container": "BorderSVGFlow",
+	"newExtensionAPI": false,
+	"dataset": {
+		"cross": "{\"data\":{\"analysisAxis\":[{\"index\":1,\"data\":[{\"type\":\"Dimension\",\"name\":\"ZZ10DBKPI-CSKS_FUNC_AREA\",\"values\":[\"FREELANCER\",\"FTG-FIN\",\"FTG-LOGISTICS\"]}]}],\"measureValuesGroup\":[{\"index\":1,\"data\":[{\"type\":\"Measure\",\"name\":\"ZZ10DBKPI-FC_INV_MNG\",\"values\":[[1995.572,1432.082,3432.761]]},{\"type\":\"Measure\",\"name\":\"ZZ10DBKPI-PL_KAPA_EFF\",\"values\":[[1995.572,2380.25,5677.45]]}]},{\"index\":2,\"data\":[{\"type\":\"Measure\",\"name\":\"Percent Utilization\",\"values\":[[100,60.1651927318559,60.4630776140697]]}]}]},\"bindings\":[{\"feed\":\"camelot.viz.ext.parallelstackedchart.PlotModule.DS1\",\"source\":[{\"type\":\"analysisAxis\",\"index\":1}]},{\"feed\":\"camelot.viz.ext.parallelstackedchart.PlotModule.MS1\",\"source\":[{\"type\":\"measureValuesGroup\",\"index\":1}]},{\"feed\":\"camelot.viz.ext.parallelstackedchart.PlotModule.MS2\",\"source\":[{\"type\":\"measureValuesGroup\",\"index\":2}]}]}",
+		"flat": "{\"metadata\":{\"dimensions\":[{\"name\":\"ZZ10DBKPI-CSKS_FUNC_AREA\",\"value\":\"{ZZ10DBKPI-CSKS_FUNC_AREA}\"}],\"measures\":[{\"name\":\"ZZ10DBKPI-FC_INV_MNG\",\"value\":\"{ZZ10DBKPI-FC_INV_MNG}\"},{\"name\":\"ZZ10DBKPI-PL_KAPA_EFF\",\"value\":\"{ZZ10DBKPI-PL_KAPA_EFF}\"},{\"name\":\"Percent Utilization\",\"value\":\"{Percent Utilization}\"}],\"data\":{\"path\":\"/data\"}},\"feedItems\":[{\"uid\":\"camelot.viz.ext.parallelstackedchart.PlotModule.DS1\",\"type\":\"Dimension\",\"values\":[\"ZZ10DBKPI-CSKS_FUNC_AREA\"]},{\"uid\":\"camelot.viz.ext.parallelstackedchart.PlotModule.MS1\",\"type\":\"Measure\",\"values\":[\"ZZ10DBKPI-FC_INV_MNG\",\"ZZ10DBKPI-PL_KAPA_EFF\"]},{\"uid\":\"camelot.viz.ext.parallelstackedchart.PlotModule.MS2\",\"type\":\"Measure\",\"values\":[\"Percent Utilization\"]}],\"data\":{\"data\":[{\"ZZ10DBKPI-CSKS_FUNC_AREA\":\"FREELANCER\",\"ZZ10DBKPI-FC_INV_MNG\":1995.572,\"ZZ10DBKPI-PL_KAPA_EFF\":1995.572,\"Percent Utilization\":100},{\"ZZ10DBKPI-CSKS_FUNC_AREA\":\"FTG-FIN\",\"ZZ10DBKPI-FC_INV_MNG\":1432.082,\"ZZ10DBKPI-PL_KAPA_EFF\":2380.25,\"Percent Utilization\":60.1651927318559},{\"ZZ10DBKPI-CSKS_FUNC_AREA\":\"FTG-LOGISTICS\",\"ZZ10DBKPI-FC_INV_MNG\":3432.761,\"ZZ10DBKPI-PL_KAPA_EFF\":5677.45,\"Percent Utilization\":60.4630776140697}]}}"
+	} >>> >>> > 178 a30390c2daae691438094fd177c0a06c6ab38
+},
+"translation": {
+	"translationDomain": "",
+	"supportedLanguages": "en,fr,de",
+	"defaultLanguage": "en",
+	"defaultI18NPropertyFile": "i18n.properties",
+	"resourceModelName": "i18n"
+}
 }
