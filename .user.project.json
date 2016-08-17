@@ -11,39 +11,12 @@
       "urlParameters": [],
       "hashParameter": "",
       "backendSystem": [],
-<<<<<<< HEAD
-      "_metadata": {
-        "runnerId": "webapprunner",
-        "id": 1306914,
-        "displayName": "Run preview.html",
-        "lastRunTimeStamp": 1471425507439
-=======
-      "urlParametersNotNeeded": false,
-      "_metadata": {
-        "runnerId": "webapprunner",
-        "id": 7758222,
-        "displayName": "Run preview.html",
-        "lastRunTimeStamp": 1470295713204
-      }
-    },
-    {
-      "filePath": "/preview.html",
-      "previewMode": 1,
-      "dataMode": 1,
-      "workspace": "withoutWorkspace",
-      "ui5ActiveVersion": null,
-      "ui5VerSource": null,
-      "isDefaultVersion": 0,
-      "urlParameters": [],
-      "hashParameter": "",
-      "backendSystem": [],
       "urlParametersNotNeeded": false,
       "_metadata": {
         "runnerId": "webapprunner",
         "id": 5538164,
         "displayName": "Run preview.html 1",
         "lastRunTimeStamp": 1469982305669
->>>>>>> 178a30390c2daae691438094fd177c0a06c6ab38
       }
     }
   ]
