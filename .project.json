@@ -1,0 +1,120 @@
+{
+  "generation": [
+    {
+      "templateId": "vizpacker.emptyProject",
+      "templateVersion": "0.0.1",
+      "dateTimeStamp": "Wed, 17 Aug 2016 14:42:12 GMT"
+    }
+  ],
+  "vizprojectmanager": {
+    "id": "camelot.viz.ext.stackedparallelcolumnchart",
+    "name": "Stacked Parallel Column Chart",
+    "version": "1.0.5",
+    "vendor": {
+      "name": "Camelot ITLab",
+      "url": "Your company website"
+    },
+    "description": " ",
+    "template": "standard",
+    "title": {
+      "enabled": true,
+      "place": "top",
+      "text": "Chart Title",
+      "alignment": "center"
+    },
+    "legend": {
+      "enabled": false,
+      "place": "right",
+      "title": {
+        "text": "City/Year"
+      }
+    },
+    "plot": {
+      "id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
+      "name": "Stacked Parallel Column Chart Module",
+      "feeds": {
+        "dimensionSets": [
+          {
+            "name": "X Axis",
+            "min": "0",
+            "max": "2",
+            "minStackedDims": "0",
+            "maxStackedDims": "Infinity",
+            "aaIndex": 1,
+            "id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.DS1",
+            "plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
+            "i": 1
+          }
+        ],
+        "measureSets": [
+          {
+            "name": "Y Axis 1",
+            "min": "0",
+            "max": "Infinity",
+            "mgIndex": 1,
+            "id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS1",
+            "plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
+            "i": 1
+          },
+          {
+            "min": "0",
+            "max": "Infinity",
+            "name": "Y Axis 2",
+            "id": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS2",
+            "mgIndex": 2,
+            "type": "Measure",
+            "plotId": "camelot.viz.ext.stackedparallelcolumnchart.PlotModule",
+            "i": 2
+          }
+        ]
+      }
+    },
+    "data": {
+      "fileName": "CamelotColumnStackedChart_v3.csv",
+      "delimiter": ",",
+      "useFirstRowAsHeader": true,
+      "fields": [
+        "Month (TD)",
+        "Time Division",
+        "Year (TD)",
+        "Capacity",
+        "Forecast (excl. Opp.)",
+        "Opportunities"
+      ],
+      "types": [
+        "Dimension",
+        "Dimension",
+        "Dimension",
+        "Measure",
+        "Measure",
+        "Measure"
+      ]
+    },
+    "binding": {
+      "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS1": [
+        "Capacity"
+      ],
+      "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.MS2": [
+        "Forecast (excl. Opp.)",
+        "Opportunities"
+      ],
+      "camelot.viz.ext.stackedparallelcolumnchart.PlotModule.DS1": [
+        "Year (TD)",
+        "Time Division",
+        "Month (TD)"
+      ]
+    },
+    "modelVersion": "0.0.2",
+    "requiresdkversion": "5.6.0",
+    "dataModel": "sap.viz.api.data.CrosstableDataset",
+    "container": "BorderSVGFlow",
+    "newExtensionAPI": false
+  },
+  "translation": {
+    "translationDomain": "",
+    "supportedLanguages": "en,fr,de",
+    "defaultLanguage": "en",
+    "defaultI18NPropertyFile": "i18n.properties",
+    "resourceModelName": "i18n"
+  }
+}
