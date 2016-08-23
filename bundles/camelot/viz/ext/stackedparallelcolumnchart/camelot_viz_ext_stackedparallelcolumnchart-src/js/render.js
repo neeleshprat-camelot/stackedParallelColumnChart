@@ -13,7 +13,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 		 */
 		var render = function(data, container) {
 
-			/* -----------------------------------------------------------------Data Preparation-------------------------------------------------------------------------- */
+			/* ----------------------------------------------------------------Data Preparation-------------------------------------------------------------------------- */
 
 			//get dimensions and measures from the metadata
 			var dset = data.meta.dimensions('X Axis');
