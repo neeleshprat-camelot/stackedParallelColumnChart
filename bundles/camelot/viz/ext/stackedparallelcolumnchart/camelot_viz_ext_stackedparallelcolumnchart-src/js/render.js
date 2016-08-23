@@ -65,8 +65,8 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 			var gridLinesVisibility = properties.gridline && (properties.gridline.visible != null) ? properties.gridline.visible : true;
 			var legendVisibility = properties.legend && (properties.legend.visible != null) ? properties.legend.visible : true;
 			var yAxisLineVisibility = properties.yAxisLine && (properties.yAxisLine.visible != null) ? properties.yAxisLine.visible : true;
-			var yAxisLabelVisible = properties.yAxisLabel && (properties.yAxisLabel.visible != null) ? properties.yAxisLabel.visible : true;
-			var capaKPIVisible = properties.capacitykpi && (properties.capacitykpi.visible != null) ? properties.capacitykpi.visible : true;
+			var yAxisLabelVisibility = properties.yAxisLabel && (properties.yAxisLabel.visible != null) ? properties.yAxisLabel.visible : true;
+			var capaKPIVisibility = properties.capacitykpi && (properties.capacitykpi.visible != null) ? properties.capacitykpi.visible : true;
 
 			var group = properties.group && (properties.group.visible != null) ? properties.group.visible : true;
 			var mc = properties.mc && (properties.mc.visible != null) ? properties.mc.visible : true;
@@ -74,9 +74,6 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 
 			var color = d3.scale.ordinal().range(["#0f75d2", "#6face4", "#799fcf", "#a6bfdf"]);
 			var opporutnityColor = "#fdff92";
-			var capaKPIcolor = "#79CCFF";
-			
-			group = false;
 
 			if (group) {
 				//variations of medium blue
@@ -110,10 +107,10 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 				.append('g').attr('class', 'camelot_viz_ext_stackedparallelcolumnchart_vis').attr('width', visWidth).attr('height', visWidth);
 
 			var visMargin = {
-				top: 0,
+				top: 10,
 				bottom: 0,
-				right: legendVisibility ? 150 : 20,
-				left: 70
+				right: legendVisibility ? 110 : 0,
+				left: yAxisLabelVisibility ? 70 : 30
 			};
 
 			//define the width and height of the vis elements plotArea + title + legend
@@ -135,9 +132,6 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 			var yAxisRange = plotAreaHeight - xAxisLabelsHeight;
 			var yAxisScale = d3.scale.linear().rangeRound([yAxisRange, 0]);
 
-			//assign domain with 20% for extra spacing
-			yAxisScale.domain([0, maxMsetSum * 1.20]);
-
 			//Y Axis Line
 			var visPlotArea_Yaxis = visPlotArea
 				.append("g")
@@ -154,19 +148,33 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 			}
 
 			var asRatio = 1000;
-			if (maxMsetSum < 2500 && maxMsetSum >= 1000) {
+			var maxGrid = maxMsetSum;
+			if (maxMsetSum < 25000 && maxMsetSum >= 5000) {
+				asRatio = 5000;
+				maxGrid = 25000;
+			} else if (maxMsetSum < 5000 && maxMsetSum >= 2500) {
+				asRatio = 1000;
+				maxGrid = 5000;
+			} else if (maxMsetSum < 2500 && maxMsetSum >= 1000) {
 				asRatio = 500;
+				maxGrid = 2500;
 			} else if (maxMsetSum < 1000 && maxMsetSum >= 500) {
 				asRatio = 200;
+				maxGrid = 1000;
 			} else if (maxMsetSum < 500 && maxMsetSum >= 100) {
 				asRatio = 100;
+				maxGrid = 500;
 			} else if (maxMsetSum < 100 && maxMsetSum >= 50) {
 				asRatio = 20;
+				maxGrid = 100;
 			} else if (maxMsetSum < 50 && maxMsetSum >= 10) {
 				asRatio = 10;
+				maxGrid = 50;
 			}
-			var numberOfTicks = 5;
-			var tDist = ((maxMsetSum / numberOfTicks) / asRatio).toFixed(0) * asRatio;
+			maxGrid = maxGrid * 1.10;
+
+			var numberOfTicks = (maxGrid / asRatio).toFixed(0);
+			var tDist = asRatio;
 			var ticks = [];
 			for (var i = 0; i < numberOfTicks; i++) {
 				var tick = {
@@ -175,6 +183,9 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 				};
 				ticks.push(tick);
 			}
+
+			//assign domain with 20% for extra spacing (already considered)
+			yAxisScale.domain([0, maxGrid]);
 
 			//Y Axis Grid Lines
 			if (gridLinesVisibility) {
@@ -225,7 +236,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					return d.label;
 				});
 
-			if (yAxisLabelVisible) {
+			if (yAxisLabelVisibility) {
 				//Y Axis Main Label
 				var mainLabelText = "";
 				for (var i = 0; i < d3.max([mset1.length, mset2.length]); i++) {
@@ -306,7 +317,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 				.attr("x2", function(d, i) {
 					return i * xAxisScaleLowestDim.rangeBand();
 				})
-				.attr("y2", 5);
+				.attr("y2", xAxisLabelsHeight - ((dset.length - 1) * asRatioxAxisLabelsHeight));
 
 			//labels for the lowest dimension
 			var visXAxisLabelsLowestDim = visPlotArea_Xaxis.append("g")
@@ -433,7 +444,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_tooltip_container-rect")
 					.attr("x", position[0] - 5)
 					.attr("y", position[1] - 40)
-					.attr("height", 30);
+					.attr("height", 20);
 
 				var tooltip_text = tooltip.append("text")
 					.attr("x", position[0])
@@ -531,9 +542,9 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					});
 			});
 
-			if (capaKPIVisible) {
+			if (capaKPIVisibility) {
 				//75% utilization line
-				var kpiLabel = "75% of avg yearly Capa.";
+				var kpiLabel = "75% of avg Capacity";
 				visPlotArea.append("g")
 					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Utilization_RefLine")
 					.attr("transform", "translate(" + 0 + "," + 0 + ")")
@@ -542,7 +553,6 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					.attr("y1", yAxisScale(capacityKpi))
 					.attr("x2", plotAreaWidth)
 					.attr("y2", yAxisScale(capacityKpi))
-					.attr("fill", capacityKpi)
 					.on("mouseover", function(d) {
 						mouseOver(kpiLabel, parseFloat(capacityKpi).toFixed(2), this);
 					})
@@ -597,7 +607,7 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 				var legendElementHeight = legendElementWidth;
 				var yDistBetweenElements = legendElementWidth;
 
-				var legendTextSize = (legendElementHeight >= 10) ? legendElementHeight : 7;
+				var legendTextSize = (legendElementHeight >= 10) ? 8 : 8;
 
 				var legend = visLegend
 					.selectAll(".camelot_viz_ext_stackedparallelcolumnchart_visLegend_legend")
@@ -624,22 +634,15 @@ define("camelot_viz_ext_stackedparallelcolumnchart-src/js/render", ["camelot_viz
 					})
 					.attr("font-size", legendTextSize);
 
-				legendElements = [];
-				//add legend element for the capacity KPI
-				var legendElement = {
-					legendColor: capaKPIcolor,
-					legendText: kpiLabel
-				};
-				legendElements.push(legendElement);
-
 				visLegend.append("line")
+					.attr("class", "camelot_viz_ext_stackedparallelcolumnchart_visPlotArea_Utilization_LegendLine")
 					.attr("x1", 0)
-					.attr("y1", 3 * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2)
+					.attr("y1", (mset1.length + mset2.length) * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2)
 					.attr("x2", legendElementWidth)
-					.attr("y2", 3 * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2);
+					.attr("y2", (mset1.length + mset2.length) * (legendElementHeight + yDistBetweenElements) + legendElementHeight / 2);
 				visLegend.append("text")
 					.attr("x", legendElementWidth + xDistBetweenElements)
-					.attr("y", (3 * (legendElementHeight + yDistBetweenElements)) + legendElementHeight)
+					.attr("y", ((mset1.length + mset2.length) * (legendElementHeight + yDistBetweenElements)) + legendElementHeight)
 					.text(kpiLabel)
 					.attr("font-size", legendTextSize);
 			}

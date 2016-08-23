@@ -17,13 +17,13 @@ define("stackedparallelcolumnchart-bundle", ["camelot_viz_ext_stackedparallelcol
 	};
 	var vizExtBundle = sap.bi.framework.declareBundle({
 		"id": "camelot.viz.ext.stackedparallelcolumnchart",
-		"version": "1.0.0",
+		"version": "1.1.0",
 		"components": [{
 			"id": "camelot.viz.ext.stackedparallelcolumnchart",
 			"provide": "sap.viz.impls",
 			"instance": vizExtImpl,
 			"customProperties": {
-				"name": "Stacked Parallel Column Chartq",
+				"name": "Stacked Parallel Column Chart",
 				"description": "",
 				"icon": {
 					"path": ""

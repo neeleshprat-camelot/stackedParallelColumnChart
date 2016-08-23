@@ -20,7 +20,7 @@ define([], function() {
 						"type": "Measure",
 						"name": "Capacity",
 						"values": [
-							[3932.775, 4006.05, 4220.1]
+							[21932.775, 11006.05, 9220.1]
 						]
 					}]
 				}, {
